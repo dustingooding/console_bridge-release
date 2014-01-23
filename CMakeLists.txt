@@ -1,19 +1,14 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.8.3)
 project(console_bridge)
 
-if (NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Release)
-endif()
-
+find_package(catkin REQUIRED)
 find_package(Boost COMPONENTS system thread REQUIRED)
 
-if(MSVC OR MSVC90 OR MSVC10)
-  set(MSVC ON)
-endif (MSVC OR MSVC90 OR MSVC10)
-
-if(MSVC)
-  add_definitions(-DBOOST_ALL_NO_LIB)
-endif(MSVC)
+catkin_package(
+  DEPENDS Boost
+  INCLUDE_DIRS include ${Boost_INCLUDE_DIR}
+  LIBRARIES ${PROJECT_NAME}
+)
 
 include_directories(include)
 include_directories(${Boost_INCLUDE_DIR})
@@ -24,28 +19,14 @@ if(NOT DEFINED BUILD_SHARED_LIBS)
 endif()
 
 add_library(${PROJECT_NAME} src/console.cpp)
-target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES})
+
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
 install(TARGETS ${PROJECT_NAME}
-  DESTINATION lib/)
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION})
 
 install(DIRECTORY include/
-  DESTINATION include
+  DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}
   FILES_MATCHING PATTERN "*.h")
-
-set(PKG_NAME ${PROJECT_NAME})
-set(PKG_LIBRARIES ${PROJECT_NAME})
-set(cmake_conf_file "${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}-config.cmake")
-configure_file("${cmake_conf_file}.in" "${cmake_conf_file}" @ONLY)
-install(FILES ${cmake_conf_file} DESTINATION share/${PROJECT_NAME}/cmake/ COMPONENT cmake)
-
-if (NOT MSVC)
-  set(PKG_DESC "Console Bridge")
-  set(PKG_CB_LIBS "-l${PROJECT_NAME}")
-  set(pkg_conf_file "${CMAKE_CURRENT_SOURCE_DIR}/console_bridge.pc")
-  configure_file("${pkg_conf_file}.in" "${pkg_conf_file}" @ONLY)
-  install(FILES ${pkg_conf_file} DESTINATION lib/pkgconfig/ COMPONENT pkgconfig)
-endif()
-
-# Install catkin package.xml
-install(FILES package.xml DESTINATION share/console_bridge)

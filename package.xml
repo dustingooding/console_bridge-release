@@ -10,15 +10,7 @@
   <author email="lunaryan@gmail.com">Ryan Luna</author>
   <author email="isucan@willowgarage.com">Ioan Sucan</author>
 
-  <buildtool_depend>cmake</buildtool_depend>
-
+  <buildtool_depend>catkin</buildtool_depend>
   <build_depend>boost</build_depend>
-
   <run_depend>boost</run_depend>
-  <run_depend>catkin</run_depend>
-
-  <export>
-    <build_type>cmake</build_type>
-  </export>
-
 </package>
